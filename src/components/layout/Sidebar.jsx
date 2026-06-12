@@ -5,6 +5,7 @@ const NAV = [
   { key: 'dashboard',  label: 'Dashboard',       icon: '⊞' },
   { key: 'proyectos',  label: 'Proyectos',        icon: '📋' },
   { key: 'nueva',      label: 'Nueva Cotización', icon: '+', accent: true },
+  { key: 'cfe',        label: 'Lector CFE',       icon: '📄' },
   { key: 'ia',         label: 'IA Center',        icon: '✨', ia: true },
 ];
 

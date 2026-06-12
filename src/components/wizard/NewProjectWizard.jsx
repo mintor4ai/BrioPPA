@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid';
 import { useApp } from '../../context/AppContext.jsx';
 import { calcularMetricasProyecto } from '../../utils/calculationEngine.js';
 import { fmtMXN, fmtUSD, fmtPct, fmtKwp } from '../../utils/formatters.js';
+import CFEReader from '../cfe/CFEReader.jsx';
 
 const STEPS = ['Cliente', 'Sistema Solar', 'Parámetros PPA', 'Resumen'];
 const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
@@ -179,8 +180,41 @@ function Field({ label, children, required }) {
 }
 
 function Step1({ form, set }) {
+  const handleDatosCFE = (datos) => {
+    if (datos.no_servicio) set('no_servicio_cfe', datos.no_servicio);
+    if (datos.tarifa) set('tarifa_cfe', datos.tarifa.includes('GDMTH') ? 'GDMTH' : datos.tarifa.includes('PDBT') ? 'PDBT' : 'GDBT');
+    if (datos.division) set('division_cfe', datos.division);
+    if (datos.cliente_nombre && !form.cliente) set('cliente', datos.cliente_nombre);
+    if (datos.cliente_direccion && !form.ubicacion) set('ubicacion', datos.cliente_direccion);
+    // Poblar consumo mensual con los datos del recibo (en el mes que corresponda)
+    if (datos.kwh_total) {
+      const mesIdx = datos.periodo
+        ? ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic']
+            .findIndex(m => datos.periodo.toLowerCase().includes(m))
+        : new Date().getMonth();
+      const idx = mesIdx >= 0 ? mesIdx : new Date().getMonth();
+      const newKwh = [...form.consumo_kwh_mensual];
+      const newKw  = [...form.consumo_kw_mensual];
+      newKwh[idx] = datos.kwh_total || (datos.kwh_base + datos.kwh_intermedia + datos.kwh_punta);
+      newKw[idx]  = datos.kw_max || datos.kw_intermedia || '';
+      set('consumo_kwh_mensual', newKwh);
+      set('consumo_kw_mensual', newKw);
+    }
+  };
+
   return (
     <div>
+      {/* Lector CFE */}
+      <div style={{ marginBottom: 20, padding: '16px', background: '#F0FDF4', borderRadius: 12, border: '1px solid #6EE7B7' }}>
+        <div style={{ fontWeight: 700, fontSize: 14, color: '#065F46', marginBottom: 4 }}>
+          📄 Lector de Recibo CFE <span style={{ fontSize: 11, fontWeight: 400, color: '#059669' }}>— opcional, pero acelera el llenado</span>
+        </div>
+        <div style={{ fontSize: 12, color: '#059669', marginBottom: 12 }}>
+          Sube el recibo en PDF o imagen y la IA extrae automáticamente los datos de consumo.
+        </div>
+        <CFEReader compact onDatosExtraidos={handleDatosCFE} />
+      </div>
+
       <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 16, color: 'var(--text-primary)' }}>Información del Cliente</div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
         <Field label="Nombre del cliente" required><input className="input-base" value={form.cliente} onChange={e => set('cliente', e.target.value)} placeholder="Ej: TEKLAS, VITRO, LALA..." /></Field>

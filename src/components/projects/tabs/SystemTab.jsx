@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import CFEReader from '../../cfe/CFEReader.jsx';
 
 export default function SystemTab({ proyecto: p, onSave, addToast }) {
   const [form, setForm] = useState({
@@ -104,6 +105,16 @@ export default function SystemTab({ proyecto: p, onSave, addToast }) {
       <button onClick={handleSave} disabled={saving} style={{ padding: '10px 24px', background: 'var(--solar-gold)', color: 'white', border: 'none', borderRadius: 8, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', fontSize: 14, opacity: saving ? 0.7 : 1 }}>
         {saving ? 'Guardando...' : 'Guardar cambios'}
       </button>
+
+      {/* Lector de recibo CFE */}
+      <div className="card" style={{ marginTop: 20 }}>
+        <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 4 }}>📄 Actualizar consumo desde recibo CFE</div>
+        <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 12 }}>Sube el recibo más reciente para actualizar los datos de consumo del cliente.</div>
+        <CFEReader compact onDatosExtraidos={(datos) => {
+          if (datos.no_servicio) setForm(f => ({ ...f, no_servicio_cfe: datos.no_servicio }));
+          addToast('Datos del recibo CFE extraídos ✓', 'success');
+        }} />
+      </div>
     </div>
   );
 }
