@@ -9,6 +9,7 @@ import ConfigPanel from './components/config/ConfigPanel.jsx';
 import NewProjectWizard from './components/wizard/NewProjectWizard.jsx';
 import CFEReaderPage from './components/cfe/CFEReaderPage.jsx';
 import SimulatorPage from './components/simulator/SimulatorPage.jsx';
+import HelpPage from './components/help/HelpPage.jsx';
 
 function AppInner() {
   const { loading, demoMode } = useApp();
@@ -54,6 +55,7 @@ function AppInner() {
           {view === 'cfe' && <CFEReaderPage onNuevaCotizacion={() => { openNew(); setView('proyectos'); }} />}
           {view === 'ia' && <IACenter setView={setView} setSelectedId={setSelectedId} />}
           {view === 'simulador' && <SimulatorPage />}
+          {view === 'ayuda' && <HelpPage />}
           {view === 'config' && <ConfigPanel />}
         </main>
       </div>

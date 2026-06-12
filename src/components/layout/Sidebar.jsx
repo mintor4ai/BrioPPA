@@ -8,6 +8,7 @@ const NAV = [
   { key: 'cfe',        label: 'Lector CFE',       icon: '📄' },
   { key: 'ia',         label: 'IA Center',        icon: '✨', ia: true },
   { key: 'simulador',  label: 'Simulador',        icon: '⚡' },
+  { key: 'ayuda',      label: 'Ayuda / Docs',     icon: '📚' },
 ];
 
 const NAV_BOTTOM = [
