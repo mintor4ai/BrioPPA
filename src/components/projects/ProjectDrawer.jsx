@@ -6,8 +6,9 @@ import ReciboTab from './tabs/ReciboTab.jsx';
 import FinancialTab from './tabs/FinancialTab.jsx';
 import SystemTab from './tabs/SystemTab.jsx';
 import IATab from './tabs/IATab.jsx';
+import AdjustTab from '../simulator/AdjustTab.jsx';
 
-const TABS = ['Resumen', 'Recibo CFE', 'Flujo Financiero', 'Sistema', '✨ IA Docs'];
+const TABS = ['Resumen', 'Recibo CFE', 'Flujo Financiero', 'Sistema', '✨ IA Docs', '⚡ Ajustar'];
 const ESTADOS = ['Prospecto', 'Cotizacion', 'Negociacion', 'Autorizado', 'Construccion', 'Operando', 'Perdido'];
 
 export default function ProjectDrawer({ proyectoId, onClose }) {
@@ -64,6 +65,7 @@ export default function ProjectDrawer({ proyectoId, onClose }) {
           {activeTab === 2 && <FinancialTab proyecto={p} />}
           {activeTab === 3 && <SystemTab proyecto={p} onSave={saveProyecto} addToast={addToast} />}
           {activeTab === 4 && <IATab proyecto={p} />}
+          {activeTab === 5 && <AdjustTab proyecto={p} />}
         </div>
       </div>
     </>

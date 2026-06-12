@@ -7,6 +7,7 @@ const NAV = [
   { key: 'nueva',      label: 'Nueva Cotización', icon: '+', accent: true },
   { key: 'cfe',        label: 'Lector CFE',       icon: '📄' },
   { key: 'ia',         label: 'IA Center',        icon: '✨', ia: true },
+  { key: 'simulador',  label: 'Simulador',        icon: '⚡' },
 ];
 
 const NAV_BOTTOM = [
