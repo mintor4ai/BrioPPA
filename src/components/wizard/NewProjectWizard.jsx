@@ -341,9 +341,23 @@ function Step3({ form, set, autoCalc }) {
         </div>
         <Field label="CAPEX total del sistema (USD)" required>
           <input className="input-base" type="number" value={form.capex_usd} onChange={e => set('capex_usd', e.target.value)} placeholder="Ej: 771288" onBlur={autoCalc} />
+          {form.capex_usd && parseFloat(form.capex_usd) > 0 && (
+            <div style={{ fontSize: 11, marginTop: 4, color: parseFloat(form.capex_usd) < 10000 ? '#EF4444' : '#64748B', fontWeight: parseFloat(form.capex_usd) < 10000 ? 700 : 400 }}>
+              {parseFloat(form.capex_usd) < 10000
+                ? `⚠ Valor muy bajo — ¿quisiste decir USD $${(parseFloat(form.capex_usd) * 1000).toLocaleString()}K?`
+                : `= USD $${parseFloat(form.capex_usd).toLocaleString('en-US', { minimumFractionDigits: 0 })} dólares`}
+            </div>
+          )}
         </Field>
         <Field label="Precio de venta (USD/W)">
           <input className="input-base" type="number" step="0.001" value={form.precio_venta_usd_w} onChange={e => set('precio_venta_usd_w', e.target.value)} placeholder="Calculado automáticamente" onBlur={autoCalc} />
+          {form.precio_venta_usd_w && parseFloat(form.precio_venta_usd_w) > 0 && (
+            <div style={{ fontSize: 11, marginTop: 4, color: parseFloat(form.precio_venta_usd_w) < 0.3 || parseFloat(form.precio_venta_usd_w) > 2 ? '#EF4444' : '#64748B', fontWeight: parseFloat(form.precio_venta_usd_w) < 0.3 || parseFloat(form.precio_venta_usd_w) > 2 ? 700 : 400 }}>
+              {parseFloat(form.precio_venta_usd_w) < 0.3 || parseFloat(form.precio_venta_usd_w) > 2
+                ? `⚠ Rango inusual — valor típico entre $0.60 y $1.20/W`
+                : `Rango típico: $0.60 – $1.20/W`}
+            </div>
+          )}
         </Field>
         <Field label="O&M anual (USD)">
           <input className="input-base" type="number" value={form.om_usd_anual} onChange={e => set('om_usd_anual', e.target.value)} placeholder="Aprox. 1.2% del CAPEX" />
@@ -367,15 +381,22 @@ function Step3({ form, set, autoCalc }) {
 }
 
 function Step4({ proyecto: p }) {
-  const tir_gpbi_pct = ((p.tir_gpbi_25 || 0) * 100).toFixed(1);
-  const cumple = parseFloat(tir_gpbi_pct) >= 20;
+  const tirRaw = (p.tir_gpbi_25 || 0) * 100;
+  const tirIrreal = tirRaw > 500 || p.capex_usd < 10000;
+  const tir_gpbi_pct = tirIrreal ? '—' : tirRaw.toFixed(1);
+  const cumple = !tirIrreal && parseFloat(tir_gpbi_pct) >= 20;
 
   return (
     <div>
       <div style={{ padding: '16px 20px', background: cumple ? '#ECFDF5' : '#FEF2F2', borderRadius: 12, border: `1px solid ${cumple ? '#6EE7B7' : '#FCA5A5'}`, marginBottom: 20 }}>
-        <div style={{ fontSize: 15, fontWeight: 700, color: cumple ? '#065F46' : '#991B1B', marginBottom: 8 }}>
-          {cumple ? '✓ Proyecto viable — TIR cumple el mínimo' : '⚠ Revisar — TIR por debajo del mínimo (20%)'}
+        <div style={{ fontSize: 15, fontWeight: 700, color: tirIrreal ? '#7C3AED' : cumple ? '#065F46' : '#991B1B', marginBottom: 8 }}>
+          {tirIrreal ? '⚠ Revisar datos — CAPEX parece muy bajo para el sistema ingresado' : cumple ? '✓ Proyecto viable — TIR cumple el mínimo' : '⚠ Revisar — TIR por debajo del mínimo (20%)'}
         </div>
+        {tirIrreal && (
+          <div style={{ fontSize: 12, color: '#7C3AED', marginBottom: 8 }}>
+            Regresa al paso 3 y verifica que el CAPEX sea el valor completo en USD (ejemplo: <strong>771,288</strong> y no <strong>771</strong>).
+          </div>
+        )}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
           <KPIPreview label="Capacidad" value={fmtKwp(p.capacidad_kwp)} />
           <KPIPreview label="CAPEX" value={fmtUSD(p.capex_usd)} />

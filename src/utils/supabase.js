@@ -16,9 +16,16 @@ export async function getProyectos() {
   return data;
 }
 
+// Campos que existen solo como estado interno del formulario, no como columnas en la BD
+const CAMPOS_FORMULARIO = ['consumo_kwh_mensual', 'consumo_kw_mensual'];
+
 export async function saveProyecto(proyecto) {
   if (!supabase) return null;
-  const { data, error } = await supabase.from('proyectos').upsert(proyecto).select().single();
+  // Eliminar campos de formulario que no son columnas de la tabla
+  const proyectoLimpio = Object.fromEntries(
+    Object.entries(proyecto).filter(([k]) => !CAMPOS_FORMULARIO.includes(k))
+  );
+  const { data, error } = await supabase.from('proyectos').upsert(proyectoLimpio).select().single();
   if (error) throw error;
   return data;
 }
