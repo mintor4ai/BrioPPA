@@ -186,7 +186,14 @@ function Step1({ form, set }) {
     if (datos.division) set('division_cfe', datos.division);
     if (datos.cliente_nombre && !form.cliente) set('cliente', datos.cliente_nombre);
     if (datos.cliente_direccion && !form.ubicacion) set('ubicacion', datos.cliente_direccion);
-    // Poblar consumo mensual con los datos del recibo (en el mes que corresponda)
+
+    // Opción 1: usar historial mensual si el usuario lo aceptó
+    if (datos.usar_historial && datos.kwh_mensual_historico) {
+      set('consumo_kwh_mensual', datos.kwh_mensual_historico.map(v => v || ''));
+      return; // ya tenemos consumo mensual completo
+    }
+
+    // Opción 2: usar datos del período actual (como antes)
     if (datos.kwh_total) {
       const mesIdx = datos.periodo
         ? ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic']

@@ -9,8 +9,25 @@ export default function CFEReaderPage({ onNuevaCotizacion }) {
 
   const handleDatos = (datos) => {
     setDatosActuales(datos);
+
+    // Si el usuario aceptó usar el historial, expandirlo como recibos individuales por mes
+    if (datos.usar_historial && datos.kwh_mensual_historico) {
+      const recibosHistorial = datos.kwh_mensual_historico
+        .map((kwh, i) => kwh ? {
+          ...datos,
+          periodo: `${['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][i]} ${new Date().getFullYear()}`,
+          kwh_total: kwh,
+          _ts: Date.now() + i,
+          _historico: true,
+        } : null)
+        .filter(Boolean);
+      if (recibosHistorial.length > 0) {
+        setRecibos(recibosHistorial.slice(0, 12));
+        return;
+      }
+    }
+
     setRecibos(prev => {
-      // Evitar duplicados por periodo
       const sinDuplicado = prev.filter(r => r.periodo !== datos.periodo);
       return [{ ...datos, _ts: Date.now() }, ...sinDuplicado].slice(0, 12);
     });
